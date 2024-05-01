@@ -270,39 +270,197 @@ return {
       }
     end,
   },
+  -- {
+  --   "jackMort/ChatGPT.nvim",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     require("chatgpt").setup {
+  --       openai_params = {
+  --         model = "default-model",
+  --         frequency_penalty = 0,
+  --         presence_penalty = 0,
+  --         max_tokens = 3000,
+  --         temperature = 0.8,
+  --         top_p = 0.8,
+  --         n = 1,
+  --       },
+  --       openai_edit_params = {
+  --         model = "default-model",
+  --         frequency_penalty = 0,
+  --         presence_penalty = 0,
+  --         max_tokens = 3000,
+  --         temperature = 0.8,
+  --         top_p = 0.8,
+  --         n = 1,
+  --       },
+  --       show_quickfixes_cmd = "Telescope quickfix",
+  --       actions_paths = {
+  --         "~/.config/nvim/lua/actions.json",
+  --       },
+  --     }
+  --   end,
+  --   dependencies = {
+  --     "MunifTanjim/nui.nvim",
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-telescope/telescope.nvim",
+  --   },
+  -- },
   {
-    "jackMort/ChatGPT.nvim",
+    "huynle/ogpt.nvim",
     event = "VeryLazy",
-    config = function()
-      require("chatgpt").setup {
-        openai_params = {
-          model = "default-model",
-          frequency_penalty = 0,
-          presence_penalty = 0,
-          max_tokens = 3000,
-          temperature = 0.8,
-          top_p = 0.8,
-          n = 1,
-        },
-        openai_edit_params = {
-          model = "default-model",
-          frequency_penalty = 0,
-          presence_penalty = 0,
-          max_tokens = 3000,
-          temperature = 0.8,
-          top_p = 0.8,
-          n = 1,
-        },
-        show_quickfixes_cmd = "Telescope quickfix",
-        actions_paths = {
-          "~/.config/nvim/lua/actions.json",
-        },
+    opts = {
+      default_provider = "ollama",
+      edgy = true,           -- enable this!
+      single_window = false, -- set this to true if you want only one OGPT window to appear at a time
+      providers = {
+        ollama = {
+          enabled = true,
+          api_host = os.getenv("OLLAMA_API_HOST") or "http://localhost:11434",
+          api_key = os.getenv("OLLAMA_API_KEY") or "",
+          model = {
+            name = "llama3"
+          },
+          models = {
+            name = "llama3"
+          },
+          api_params = {
+            -- used for `edit` and `edit_code` strategy in the actions
+            model = "llama3",
+            -- model = "mistral:7b",
+            -- frequency_penalty = 0,
+            -- presence_penalty = 0,
+            temperature = 0.5,
+            top_p = 0.99,
+          },
+          api_chat_params = {
+            -- use default ollama model
+            model = "llama3",
+            temperature = 0.8,
+            top_p = 0.99,
+          },
+        }
       }
-    end,
+    },
     dependencies = {
       "MunifTanjim/nui.nvim",
       "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
+      "nvim-telescope/telescope.nvim"
+    }
+  },
+  {
+    "folke/edgy.nvim",
+    event = "VeryLazy",
+    init = function()
+      vim.opt.laststatus = 3
+      vim.opt.splitkeep = "screen" -- or "topline" or "screen"
+    end,
+    opts = {
+      exit_when_last = false,
+      animate = {
+        enabled = false,
+      },
+      wo = {
+        winbar = true,
+        winfixwidth = true,
+        winfixheight = false,
+        winhighlight = "WinBar:EdgyWinBar,Normal:EdgyNormal",
+        spell = false,
+        signcolumn = "no",
+      },
+      keys = {
+        -- -- close window
+        ["q"] = function(win)
+          win:close()
+        end,
+        -- close sidebar
+        ["Q"] = function(win)
+          win.view.edgebar:close()
+        end,
+        -- increase width
+        ["<S-Right>"] = function(win)
+          win:resize("width", 3)
+        end,
+        -- decrease width
+        ["<S-Left>"] = function(win)
+          win:resize("width", -3)
+        end,
+        -- increase height
+        ["<S-Up>"] = function(win)
+          win:resize("height", 3)
+        end,
+        -- decrease height
+        ["<S-Down>"] = function(win)
+          win:resize("height", -3)
+        end,
+      },
+      right = {
+        {
+          title = "OGPT Popup",
+          ft = "ogpt-popup",
+          size = { width = 0.2 },
+          wo = {
+            wrap = true,
+          },
+        },
+        {
+          title = "OGPT Parameters",
+          ft = "ogpt-parameters-window",
+          size = { height = 6 },
+          wo = {
+            wrap = true,
+          },
+        },
+        {
+          title = "OGPT Template",
+          ft = "ogpt-template",
+          size = { height = 6 },
+        },
+        {
+          title = "OGPT Sessions",
+          ft = "ogpt-sessions",
+          size = { height = 6 },
+          wo = {
+            wrap = true,
+          },
+        },
+        {
+          title = "OGPT System Input",
+          ft = "ogpt-system-window",
+          size = { height = 6 },
+        },
+        {
+          title = "OGPT",
+          ft = "ogpt-window",
+          size = { height = 0.5 },
+          wo = {
+            wrap = true,
+          },
+        },
+        {
+          title = "OGPT {{{selection}}}",
+          ft = "ogpt-selection",
+          size = { width = 80, height = 4 },
+          wo = {
+            wrap = true,
+          },
+        },
+        {
+          title = "OGPt {{{instruction}}}",
+          ft = "ogpt-instruction",
+          size = { width = 80, height = 4 },
+          wo = {
+            wrap = true,
+          },
+        },
+        {
+          title = "OGPT Chat",
+          ft = "ogpt-input",
+          size = { width = 80, height = 4 },
+          wo = {
+            wrap = true,
+          },
+        },
+      },
     },
   },
   {
